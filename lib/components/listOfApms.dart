@@ -4,6 +4,8 @@ import 'package:apm_pip/models/apmModel.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:flutter_slidable/flutter_slidable.dart';
+
 class ListOfApms extends StatefulWidget {
   @override
   _ListOfApmsState createState() => _ListOfApmsState();
@@ -24,11 +26,10 @@ class _ListOfApmsState extends State<ListOfApms> {
 
  //force the floatingactionBtn to appear 3 seconds later (when data has to be loaded)
   void setTimer(){
-    Timer t = new Timer(Duration(seconds: 3), (){
+    Timer(Duration(seconds: 3), (){
       setState(() {
         viewFloatingActBtn = true;
-      });
-      
+      });  
     });
   }
 
@@ -54,6 +55,7 @@ class _ListOfApmsState extends State<ListOfApms> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,17 +79,41 @@ class _ListOfApmsState extends State<ListOfApms> {
                   itemBuilder: (context,i) =>
                   Column(
                     children : [
-                        i != 0 ?
-                          Divider(height : 5) : Container(),
+                      viewFloatingActBtn == false && i == 0
+                      ? Padding(
+                          padding: EdgeInsets.all(15),
+                          child : Text('Mantén presionado en alguna fila para ver las operaciones disponibles',style: TextStyle(fontSize: 20),textAlign: TextAlign.center,))
+                      : Container(),
+                      i != 0 ?
+                        Divider(height : 5) : Container(),
 
-                        ListTile(
-                          leading: Icon(
-                            Icons.play_circle_fill
+                      Slidable(
+                        actionPane: SlidableDrawerActionPane(),
+                        actionExtentRatio: 0.25,
+                        child : ListApmElement(apm : result.data[i]),
+                        actions: [
+                          IconSlideAction(
+                            caption: 'Ver',
+                            color: Colors.greenAccent,
+                            icon: Icons.play_arrow,
+                            onTap: () => print(result.data[i].name + ' > ' + result.data[i].url),
                           ),
-                          title : Text(result.data[i].name),
-                          subtitle: result.data[i].desc != '' ? Text(result.data[i].desc) : Text('Sin descripción'),
-                          onTap: () => print(result.data[i].name + ' > ' + result.data[i].url),
-                        )
+                        ],
+                        secondaryActions: [
+                          IconSlideAction(
+                            caption: 'Editar',
+                            color: Colors.orangeAccent,
+                            icon: Icons.edit,
+                            onTap: () => print('Edit'),
+                          ),
+                          IconSlideAction(
+                            caption: 'Eliminar',
+                            color: Colors.redAccent,
+                            icon: Icons.delete,
+                            onTap: () => print('Delete'),
+                          ),
+                        ],
+                      ),   
                     ]
                   )
               ),
@@ -118,5 +144,38 @@ class _ListOfApmsState extends State<ListOfApms> {
           )
         : Container()
     );
+  }
+}
+
+class ListApmElement extends StatelessWidget {
+Apm apm;
+ListApmElement({this.apm});
+
+  void _demoOfSlidable(BuildContext context){
+    SlidableState slidableState = Slidable.of(context);
+     
+    slidableState.open(actionType : SlideActionType.primary);
+
+    Timer(Duration(milliseconds: 1500 ), (){
+      slidableState.close();
+      slidableState.open(actionType : SlideActionType.secondary);
+    });
+
+    Timer(Duration(milliseconds: 3000 ), (){
+      slidableState.close();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+        leading: Icon(
+          Icons.play_circle_fill,
+          size: 50,
+        ),
+        title : Text(apm.name),
+        subtitle: apm.desc != '' ? Text(apm.desc) : Text('Sin descripción'),
+        onLongPress: () => _demoOfSlidable(context),
+      );
   }
 }
