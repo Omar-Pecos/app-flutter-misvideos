@@ -20,4 +20,18 @@ class Apm{
       updatedAt: DateTime.parse( json['updatedAt']),
     );
   }
+
+   @override
+  String toString() {
+    return 'APM: {id : $id, name: $name, command: $command, desc : $desc, url : $url}';
+  }
+}
+
+//class creationResult - helper
+
+class CreationResult{
+  bool result;
+  Apm apm;
+
+  CreationResult({this.result,this.apm});
 }
