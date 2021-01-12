@@ -12,25 +12,32 @@ class ListOfApms extends StatefulWidget {
 class _ListOfApmsState extends State<ListOfApms> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   Future<List<Apm>> futureListApm$;
-  bool dataLoaded = false;
+  bool viewFloatingActBtn = false;
 
   @override
   void initState() {
     super.initState();
 
     futureListApm$ = HttpHandler().getAll();
-    Timer t = setTimer();
+    setTimer();
   }
 
  //force the floatingactionBtn to appear 3 seconds later (when data has to be loaded)
-  Timer setTimer(){
-    return new Timer(Duration(seconds: 3), (){
+  void setTimer(){
+    Timer t = new Timer(Duration(seconds: 3), (){
       setState(() {
-        dataLoaded = true;
+        viewFloatingActBtn = true;
       });
       
     });
-    //timer.cancel();
+  }
+
+  Future _reloadData(int seconds) async {
+    if (seconds > 0)
+      await Future.delayed(Duration(seconds: seconds));
+    setState(() {
+            futureListApm$ = HttpHandler().getAll();
+    });
   }
 
   void _openCreateForm() async{
@@ -41,9 +48,7 @@ class _ListOfApmsState extends State<ListOfApms> {
     );
 
     if (result?.result == true){
-      setState(() {
-        futureListApm$ = HttpHandler().getAll();
-      });
+      _reloadData(0);
        SnackBar snackbar = SnackBar(content: Text('"'+ result.apm.name + '" creado correctamente'),duration: Duration(seconds : 3));
        _scaffoldKey.currentState.showSnackBar(snackbar);
     }
@@ -62,26 +67,32 @@ class _ListOfApmsState extends State<ListOfApms> {
           // WITH DATA
           if (result.hasData){
             
-            return ListView.builder(
-              itemCount : result.data.length,
-              itemBuilder: (context,i) =>
-                Column(
-                children : [
-                    i != 0 ?
-                      Divider(height : 5) : Container(),
+            return RefreshIndicator(
+              onRefresh: () => _reloadData(1),
+              strokeWidth: 4,
+              backgroundColor: Colors.grey,
+              child: 
+              ListView.builder(
+                  itemCount : result.data.length,
+                  itemBuilder: (context,i) =>
+                  Column(
+                    children : [
+                        i != 0 ?
+                          Divider(height : 5) : Container(),
 
-                    ListTile(
-                      leading: Icon(
-                        Icons.play_circle_fill
-                      ),
-                      title : Text(result.data[i].name),
-                      subtitle: result.data[i].desc != '' ? Text(result.data[i].desc) : Text('Sin descripción'),
-                      onTap: () => print(result.data[i].name + ' > ' + result.data[i].url),
-                    )
-                ]
-              )
-               
+                        ListTile(
+                          leading: Icon(
+                            Icons.play_circle_fill
+                          ),
+                          title : Text(result.data[i].name),
+                          subtitle: result.data[i].desc != '' ? Text(result.data[i].desc) : Text('Sin descripción'),
+                          onTap: () => print(result.data[i].name + ' > ' + result.data[i].url),
+                        )
+                    ]
+                  )
+              ),
             );
+            
           } else if(result.hasError){
             /*// ERROR
              var snackbar = SnackBar(content: Text(result.error));
@@ -100,7 +111,7 @@ class _ListOfApmsState extends State<ListOfApms> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: 
-        dataLoaded ?
+        viewFloatingActBtn ?
           FloatingActionButton(
             onPressed: () => _openCreateForm(),
             child : Icon(Icons.plus_one)
