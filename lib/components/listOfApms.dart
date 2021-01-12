@@ -55,6 +55,39 @@ class _ListOfApmsState extends State<ListOfApms> {
     }
   }
 
+  void _showDeleteConfirmation(BuildContext ctx, Apm apm){
+    AlertDialog dialog = new AlertDialog(
+      title: ListTile(
+        leading: Icon(Icons.warning,color: Colors.orangeAccent,),
+        title: Text('Confirmación de borrado'),
+      ),
+      contentPadding: EdgeInsets.all(20),
+      content: Text('El APM con nombre "${apm.name}" se eliminará y no podrá recuperarlo. ¿Desea proceder con la eliminación?'),
+      actions: [
+        FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancelar'),color : Colors.black26,textColor: Colors.white,),
+        FlatButton(onPressed: () => _sendDelete(ctx, apm.id), child: Text('Eliminar'),color : Colors.black26,textColor: Colors.white,)
+      ],
+    );
+
+    showDialog(context: ctx,child : dialog);
+    
+  }
+
+  void _sendDelete(BuildContext ctx,int id) async{
+    //close dialog
+    Navigator.of(context).pop();
+    try{
+      Apm deletedApm = await HttpHandler().delete(id);
+      Scaffold.of(ctx).showSnackBar(
+        SnackBar(content: Text('"'+ deletedApm.name + '" se ha eliminado correctamente'), duration: Duration(seconds : 3)));
+      _reloadData(0);
+    }catch(e){
+      Scaffold.of(ctx).showSnackBar(
+        SnackBar(content: Text(e, style: TextStyle(color: Colors.white),),backgroundColor: Colors.red[300], duration: Duration(seconds : 3)));
+    }
+    
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +143,7 @@ class _ListOfApmsState extends State<ListOfApms> {
                             caption: 'Eliminar',
                             color: Colors.redAccent,
                             icon: Icons.delete,
-                            onTap: () => print('Delete'),
+                            onTap: () => _showDeleteConfirmation(context, result.data[i]),
                           ),
                         ],
                       ),   

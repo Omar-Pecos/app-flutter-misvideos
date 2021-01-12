@@ -70,4 +70,20 @@ class HttpHandler {
         throw errorMsg;
       }
     } 
+
+    Future<Apm> delete(int id) async{
+      try {
+        final Response res = await dio.delete(endpoint + '/' + id.toString());
+        final resBody = res.data;
+
+        if (res.statusCode == 200){
+          return Apm.fromJson(resBody['data']);
+        }
+      } catch (e) {
+        final resError = e.response.data;
+        String errorMsg = resError['error'];
+
+        throw errorMsg;
+      }
+    }
   }
