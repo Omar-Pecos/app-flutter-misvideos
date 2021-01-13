@@ -1,4 +1,4 @@
-import 'package:apm_pip/components/listOfApms.dart';
+import 'package:apm_pip/Home.dart';
 import 'package:flutter/material.dart';
 
  void main() { 
@@ -16,6 +16,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListOfApms();
+    return Home();
   }
 }
