@@ -35,3 +35,10 @@ class CreationResult{
 
   CreationResult({this.result,this.apm});
 }
+
+class EditionResult{
+  bool result;
+  Apm apm;
+
+  EditionResult({this.result,this.apm});
+}

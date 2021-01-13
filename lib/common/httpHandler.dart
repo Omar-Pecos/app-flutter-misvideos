@@ -36,10 +36,7 @@ class HttpHandler {
           ).toList();
         } 
     }catch (e) {
-      final resError = e.response.data;
-      String errorMsg = resError['error'];
-      
-      throw errorMsg;
+      errorHandler(e);
     }
 
   }
@@ -64,10 +61,7 @@ class HttpHandler {
       }
 
     }catch(e){
-        final resError = e.response.data;
-        String errorMsg = resError['error'];
-      
-        throw errorMsg;
+      errorHandler(e);
       }
     } 
 
@@ -80,10 +74,45 @@ class HttpHandler {
           return Apm.fromJson(resBody['data']);
         }
       } catch (e) {
+        errorHandler(e);
+      }
+    }
+
+    Future<Apm> edit(Apm apm) async{
+      try{
+        final res = await dio.put(
+            endpoint + '/' + apm.id.toString(),
+            data: {
+              "name" : apm.name,
+              "command" : apm.command,
+              "desc" : apm.desc,
+              "url" : apm.url
+            });
+        final resBody = res.data;
+
+        if (res.statusCode == 200){
+          return Apm.fromJson(resBody['data']);
+        }
+      }catch(e){
+        errorHandler(e);
+      }
+    }
+
+    void errorHandler(e){
+       if (e.response != null){
         final resError = e.response.data;
         String errorMsg = resError['error'];
-
+        
         throw errorMsg;
       }
+
+      if (e.error.osError != null){
+        int code = e.error.osError.errorCode;
+        if (code == 101)
+          throw 'Sin conexión a internet';
+        if (code == 111)
+          throw 'Conexión rechazada. Posiblemente la API no esté online';
+      }
+      throw e.error?.message;
     }
   }

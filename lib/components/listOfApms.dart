@@ -1,5 +1,6 @@
 import 'package:apm_pip/common/httpHandler.dart';
 import 'package:apm_pip/components/create.dart';
+import 'package:apm_pip/components/edit.dart';
 import 'package:apm_pip/models/apmModel.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -88,6 +89,20 @@ class _ListOfApmsState extends State<ListOfApms> {
     
   }
 
+  void _openEditForm(Apm apm) async{
+    final result = await Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => 
+            EditApm(apm: apm) 
+          )
+    );
+
+     if (result?.result == true){
+      _reloadData(0);
+       SnackBar snackbar = SnackBar(content: Text('"'+ result.apm.name + '" editado correctamente'),duration: Duration(seconds : 3));
+       _scaffoldKey.currentState.showSnackBar(snackbar);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +138,8 @@ class _ListOfApmsState extends State<ListOfApms> {
                       Slidable(
                         actionPane: SlidableDrawerActionPane(),
                         actionExtentRatio: 0.25,
-                        child : ListApmElement(apm : result.data[i]),
+                        child : 
+                          ListApmElement(apm : result.data[i]),
                         actions: [
                           IconSlideAction(
                             caption: 'Ver',
@@ -137,7 +153,7 @@ class _ListOfApmsState extends State<ListOfApms> {
                             caption: 'Editar',
                             color: Colors.orangeAccent,
                             icon: Icons.edit,
-                            onTap: () => print('Edit'),
+                            onTap: () => _openEditForm(result.data[i]),
                           ),
                           IconSlideAction(
                             caption: 'Eliminar',
@@ -159,7 +175,12 @@ class _ListOfApmsState extends State<ListOfApms> {
              return Center(
                child: Container(child :  CircularProgressIndicator(),width: 50,height: 50)
              );*/
-             return Text(result.error);
+             return Center(
+               child: Padding(
+                 padding: EdgeInsets.all(20),
+                 child : Text(result.error, style: TextStyle(fontSize: 20),textAlign: TextAlign.center,)
+               ) 
+             );
           }
 
           //DEFAULT
@@ -203,7 +224,7 @@ ListApmElement({this.apm});
   Widget build(BuildContext context) {
     return ListTile(
         leading: Icon(
-          Icons.play_circle_fill,
+          Icons.live_tv,
           size: 50,
         ),
         title : Text(apm.name),

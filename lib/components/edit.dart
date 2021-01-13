@@ -2,39 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:apm_pip/models/apmModel.dart';
 import 'package:apm_pip/common/httpHandler.dart';
 
-class CreateAPM extends StatefulWidget {
+class EditApm extends StatefulWidget {
+
+  final Apm apm;
+  EditApm({@required this.apm});
+
   @override
-  _CreateAPMState createState() => _CreateAPMState();
+  _EditApmState createState() => _EditApmState(apm: apm);
 }
 
-class _CreateAPMState extends State<CreateAPM> {
+class _EditApmState extends State<EditApm> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Apm apm;
+  _EditApmState({@required this.apm});
 
-   Apm apm = new Apm(
-      id: 0,
-      name: '',
-      command: '',
-      desc: '',
-      url : '',
-      createdAt: new DateTime.now(),
-      updatedAt: new DateTime.now()
-    );
+  TextEditingController _nameController = new TextEditingController();
+  TextEditingController _descController = new TextEditingController();
+  TextEditingController _commandController = new TextEditingController();
+  TextEditingController _urlController = new TextEditingController();
 
-    TextEditingController _nameController = new TextEditingController();
-    TextEditingController _descController = new TextEditingController();
-    TextEditingController _commandController = new TextEditingController();
-    TextEditingController _urlController = new TextEditingController();
-  
-  void _sendPost(Apm apm) async{
-   Apm apmCreated;
+  @override
+  void initState() {
+    super.initState();
+
+    _nameController.text = apm.name;
+    _descController.text = apm.desc;
+    _commandController.text = apm.command;
+    _urlController.text = apm.url;
+  }
+
+  void _sendPut(Apm apm) async{
+   Apm apmEdited;
     try{
-      apmCreated = await HttpHandler().create(apm);
+
+      apmEdited = await HttpHandler().edit(apm);
       //pop con data de vuelta - para hacer el reload
-      Navigator.of(context).pop(CreationResult(result : true, apm : apmCreated));
+      Navigator.of(context).pop(EditionResult(result : true, apm : apmEdited));
+
     } catch(error){    
-        //print(error);
+
       SnackBar snackbar = SnackBar(content: Text(error, style: TextStyle(color: Colors.white),),backgroundColor: Colors.red[300], duration: Duration(seconds : 3));
      _scaffoldKey.currentState.showSnackBar(snackbar);
+
     }
   }
 
@@ -43,7 +52,7 @@ class _CreateAPMState extends State<CreateAPM> {
     return Scaffold(
       key: _scaffoldKey,
        appBar: AppBar(
-        title: Text('Crear'),
+        title: Text('Editar'),
       ),
       body : Center(
         child : ListView(
@@ -54,7 +63,7 @@ class _CreateAPMState extends State<CreateAPM> {
                  children: [
                    CircleAvatar(
                      radius: 30,
-                     child : Icon(Icons.plus_one_rounded, size: 40),
+                     child : Icon(Icons.edit, size: 40),
                      backgroundColor: Colors.grey,
                    ),
                     TextField(
@@ -84,12 +93,12 @@ class _CreateAPMState extends State<CreateAPM> {
                         RaisedButton(
                             disabledColor : Colors.white70,
                             color : Colors.black26,
-                            onPressed: () => Navigator.of(context).pop(CreationResult(result : false, apm : null)), child: Text('Cancelar')),
+                            onPressed: () => Navigator.of(context).pop(EditionResult(result : false, apm : null)), child: Text('Cancelar')),
                          RaisedButton(
                             disabledColor : Colors.white70,
                             color : Colors.black26,
-                            onPressed: () => _sendPost(apm),
-                            child: Text('Crear'))
+                            onPressed: () => _sendPut(apm),
+                            child: Text('Editar'))
                       ],
                     )
                  ],
