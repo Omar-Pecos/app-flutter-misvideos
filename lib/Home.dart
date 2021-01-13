@@ -2,6 +2,7 @@
 import 'package:apm_pip/common/httpHandler.dart';
 import 'package:apm_pip/components/create.dart';
 import 'package:apm_pip/components/edit.dart';
+import 'package:apm_pip/components/youtubeVideoViewer.dart';
 import 'package:apm_pip/models/apmModel.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -15,7 +16,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   Future<List<Apm>> futureListApm$;
   bool viewFloatingActBtn = false;
 
@@ -57,11 +57,11 @@ class _HomeState extends State<Home> {
     if (result?.result == true){
       _reloadData(0);
        SnackBar snackbar = SnackBar(content: Text('"'+ result.apm.name + '" creado correctamente'),duration: Duration(seconds : 3));
-       _scaffoldKey.currentState.showSnackBar(snackbar);
+        Scaffold.of(context).showSnackBar(snackbar);
     }
   }
 
-  void _showDeleteConfirmation(BuildContext ctx, Apm apm){
+  void _showDeleteConfirmation(Apm apm){
     AlertDialog dialog = new AlertDialog(
       title: ListTile(
         leading: Icon(Icons.warning,color: Colors.orangeAccent,),
@@ -71,24 +71,24 @@ class _HomeState extends State<Home> {
       content: Text('El APM con nombre "${apm.name}" se eliminará y no podrá recuperarlo. ¿Desea proceder con la eliminación?'),
       actions: [
         FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancelar'),color : Colors.black26,textColor: Colors.white,),
-        FlatButton(onPressed: () => _sendDelete(ctx, apm.id), child: Text('Eliminar'),color : Colors.black26,textColor: Colors.white,)
+        FlatButton(onPressed: () => _sendDelete(apm.id), child: Text('Eliminar'),color : Colors.black26,textColor: Colors.white,)
       ],
     );
 
-    showDialog(context: ctx,child : dialog);
+    showDialog(context : context,child : dialog);
     
   }
 
-  void _sendDelete(BuildContext ctx,int id) async{
+  void _sendDelete(int id) async{
     //close dialog
     Navigator.of(context).pop();
     try{
       Apm deletedApm = await HttpHandler().delete(id);
-      Scaffold.of(ctx).showSnackBar(
+      Scaffold.of(context).showSnackBar(
         SnackBar(content: Text('"'+ deletedApm.name + '" se ha eliminado correctamente'), duration: Duration(seconds : 3)));
       _reloadData(0);
     }catch(e){
-      Scaffold.of(ctx).showSnackBar(
+      Scaffold.of(context).showSnackBar(
         SnackBar(content: Text(e, style: TextStyle(color: Colors.white),),backgroundColor: Colors.red[300], duration: Duration(seconds : 3)));
     }
     
@@ -104,7 +104,7 @@ class _HomeState extends State<Home> {
      if (result?.result == true){
       _reloadData(0);
        SnackBar snackbar = SnackBar(content: Text('"'+ result.apm.name + '" editado correctamente'),duration: Duration(seconds : 3));
-       _scaffoldKey.currentState.showSnackBar(snackbar);
+        Scaffold.of(context).showSnackBar(snackbar);
     }
   }
 
@@ -121,117 +121,101 @@ void _openVideoUrl(String url) async{
   @override
   Widget build(BuildContext context) {
     return PIPStack(
-        backgroundWidget: Scaffold(
-                    key: _scaffoldKey,
-                    appBar: AppBar(
-                      title: Text('Lista de APMs - Inicio'),
-                    ),
-                    body: FutureBuilder<List<Apm>>(
-                      future: futureListApm$,
-                      builder: (context,result){
-                        // WITH DATA
-                        if (result.hasData){
-                          
-                          return RefreshIndicator(
-                            onRefresh: () => _reloadData(1),
-                            strokeWidth: 4,
-                            backgroundColor: Colors.grey,
-                            child: 
-                            ListView.builder(
-                                itemCount : result.data.length,
-                                itemBuilder: (context,i) =>
-                                Column(
-                                  children : [
-                                    viewFloatingActBtn == false && i == 0
-                                    ? Padding(
-                                        padding: EdgeInsets.all(15),
-                                        child : Text('Mantén presionado en alguna fila para ver las operaciones disponibles',style: TextStyle(fontSize: 20),textAlign: TextAlign.center,))
-                                    : Container(),
-                                    i != 0 ?
-                                      Divider(height : 5) : Container(),
+        backgroundWidget:
+        
+         Scaffold(
+            appBar: AppBar(
+              title: Text('Lista de APMs'),
+            ),
+            body: FutureBuilder<List<Apm>>(
+              future: futureListApm$,
+              builder: (context,result){
+                // WITH DATA
+                if (result.hasData){
+                  
+                  return RefreshIndicator(
+                    onRefresh: () => _reloadData(1),
+                    strokeWidth: 4,
+                    backgroundColor: Colors.grey,
+                    child: 
+                    ListView.builder(
+                        itemCount : result.data.length,
+                        itemBuilder: (context,i) =>
+                        Column(
+                          children : [
+                            viewFloatingActBtn == false && i == 0
+                            ? Padding(
+                                padding: EdgeInsets.all(15),
+                                child : Text('Mantén presionado en alguna fila para ver las operaciones disponibles',style: TextStyle(fontSize: 20),textAlign: TextAlign.center,))
+                            : Container(),
+                            i != 0 ?
+                              Divider(height : 5) : Container(),
 
-                                    Slidable(
-                                      actionPane: SlidableDrawerActionPane(),
-                                      actionExtentRatio: 0.25,
-                                      child : 
-                                        ListApmElement(apm : result.data[i]),
-                                      actions: [
-                                        IconSlideAction(
-                                          caption: 'Ver',
-                                          color: Colors.greenAccent,
-                                          icon: Icons.play_arrow,
-                                         /* onTap: () => print(result.data[i].name + ' > ' + result.data[i].url),*/
-                                          onTap: () => _openVideoUrl(result.data[i].name),
-                                        ),
-                                      ],
-                                      secondaryActions: [
-                                        IconSlideAction(
-                                          caption: 'Editar',
-                                          color: Colors.orangeAccent,
-                                          icon: Icons.edit,
-                                          onTap: () => _openEditForm(result.data[i]),
-                                        ),
-                                        IconSlideAction(
-                                          caption: 'Eliminar',
-                                          color: Colors.redAccent,
-                                          icon: Icons.delete,
-                                          onTap: () => _showDeleteConfirmation(context, result.data[i]),
-                                        ),
-                                      ],
-                                    ),   
-                                  ]
-                                )
-                            ),
-                          );
-                          
-                        } else if(result.hasError){
-                          /*// ERROR
-                          var snackbar = SnackBar(content: Text(result.error));
-                          Scaffold.of(context).showSnackBar(snackbar);
-                          return Center(
-                            child: Container(child :  CircularProgressIndicator(),width: 50,height: 50)
-                          );*/
-                          return Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(20),
-                              child : Text(result.error, style: TextStyle(fontSize: 20),textAlign: TextAlign.center,)
-                            ) 
-                          );
-                        }
-
-                        //DEFAULT
-                        return Center(
-                            child: Container(child :  CircularProgressIndicator(),width: 50,height: 50)
-                          );
-                      },
-                    ),
-                    floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-                    floatingActionButton: 
-                      viewFloatingActBtn ?
-                        FloatingActionButton(
-                          onPressed: () => _openCreateForm(),
-                          child : Icon(Icons.plus_one)
+                            Slidable(
+                              actionPane: SlidableDrawerActionPane(),
+                              actionExtentRatio: 0.25,
+                              child : 
+                                ListApmElement(apm : result.data[i]),
+                              actions: [
+                                IconSlideAction(
+                                  caption: 'Ver',
+                                  color: Colors.greenAccent,
+                                  icon: Icons.play_arrow,
+                                  onTap: () => _openVideoUrl(result.data[i].url),
+                                ),
+                              ],
+                              secondaryActions: [
+                                IconSlideAction(
+                                  caption: 'Editar',
+                                  color: Colors.orangeAccent,
+                                  icon: Icons.edit,
+                                  onTap: () => _openEditForm(result.data[i]),
+                                ),
+                                IconSlideAction(
+                                  caption: 'Eliminar',
+                                  color: Colors.redAccent,
+                                  icon: Icons.delete,
+                                  onTap: () => _showDeleteConfirmation(result.data[i]),
+                                ),
+                              ],
+                            ),   
+                          ]
                         )
-                      : Container()
-                  ),
-        pipWidget: isEnabled
-            ? Container(
-                  padding: EdgeInsets.only(top : 20),
-                  color : Colors.pink,
-                  child: Column(
-                    children : [
-                      Image.network('https://images.unsplash.com/photo-1610441009633-b6ca9c6d4be2?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1080&fit=max',height: 100,),
-                      Text(videoUrl,style: TextStyle(fontSize: 20,color: Colors.white),)
-                    ]
-                  ),
-            ) 
-          : Container(),
-        pipEnabled: isEnabled,
-        pipExpandedContent: Card(
-          child: Column(
-            children: <Widget>[Text("Hello World"), Row()],
+                    ),
+                  );
+                  
+                } else if(result.hasError){
+                  return Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child : Text(result.error, style: TextStyle(fontSize: 20),textAlign: TextAlign.center,)
+                    ) 
+                  );
+                }
+
+                //DEFAULT
+                return Center(
+                    child: Container(child :  CircularProgressIndicator(),width: 50,height: 50)
+                  );
+              },
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: 
+              viewFloatingActBtn ?
+                FloatingActionButton(
+                  onPressed: () => _openCreateForm(),
+                  child : Icon(Icons.plus_one)
+                )
+              : Container()
           ),
-        ),
+
+        pipWidget: isEnabled
+            ? YoutubeVideoViewer(url : videoUrl)
+          : Container(),
+
+        pipEnabled: isEnabled,
+        pipShrinkHeight: 130,
+
         onClosed: () {
           setState(() {
             isEnabled = !isEnabled;
@@ -242,8 +226,8 @@ void _openVideoUrl(String url) async{
 }
 
 class ListApmElement extends StatelessWidget {
-Apm apm;
-ListApmElement({this.apm});
+final Apm apm;
+ListApmElement({@required this.apm});
 
   void _demoOfSlidable(BuildContext context){
     SlidableState slidableState = Slidable.of(context);
@@ -265,9 +249,10 @@ ListApmElement({this.apm});
     return ListTile(
         leading: Icon(
           Icons.live_tv,
-          size: 50,
+          size: 40,
         ),
         title : Text(apm.name),
+        contentPadding: EdgeInsets.all(10),
         subtitle: apm.desc != '' ? Text(apm.desc) : Text('Sin descripción'),
         onLongPress: () => _demoOfSlidable(context),
       );
