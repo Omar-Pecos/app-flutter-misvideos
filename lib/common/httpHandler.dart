@@ -16,10 +16,8 @@ class HttpHandler {
 
   String createEndpoint(){
       String endpoint;
-      if (env == 'development')
-          endpoint = 'http://' + _baseUrl + '/api/v1/apm';
-        else
-          endpoint = 'https://' + _baseUrl + '/api/v1/apm';
+      
+      endpoint = _baseUrl + '/api/v1/apm';
           
       return endpoint;
   }
