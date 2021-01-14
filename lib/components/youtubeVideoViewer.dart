@@ -1,5 +1,7 @@
+import 'package:apm_pip/common/httpHandler.dart';
 import 'package:flutter/material.dart';
 import 'package:ext_video_player/ext_video_player.dart';
+import 'package:apm_pip/models/apmModel.dart';
 
 class YoutubeVideoViewer extends StatefulWidget {
   final url;
@@ -14,22 +16,37 @@ class _YoutubeVideoViewerState extends State<YoutubeVideoViewer> {
   VideoPlayerController _controller;
   String url;
 
+  bool dataLoaded = false;
+  List<Apm> apmList;
+
   _YoutubeVideoViewerState({@required this.url});
 
  
   @override
   void initState() {
     super.initState();
-          _controller = VideoPlayerController.network(
-            url
-          );
-          print(url);
-          _controller.addListener(() {
-            setState(() {});
-          });
-          _controller.setLooping(true);
-          _controller.initialize().catchError((e) => onError(e));
+
+      loadApms();
+      
+      _controller = VideoPlayerController.network(
+        url
+      );
+      print(url);
+      _controller.addListener(() {
+        setState(() {});
+      });
+      _controller.setLooping(true);
+      _controller.initialize().catchError((e) => onError(e));
     
+  }
+
+  void loadApms() async{
+    try {
+      apmList = await HttpHandler().getAll();
+      dataLoaded = true;
+    } catch (e) {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(e, style: TextStyle(color: Colors.white),),backgroundColor: Colors.red[300]));
+    }
   }
 
   void onError(error){
@@ -58,7 +75,7 @@ class _YoutubeVideoViewerState extends State<YoutubeVideoViewer> {
           setState(() {});
         });
         _controller.setLooping(true);
-        _controller.initialize();
+        _controller.initialize().catchError((e) => onError(e));
     });
   }
 
@@ -86,39 +103,27 @@ class _YoutubeVideoViewerState extends State<YoutubeVideoViewer> {
             ),
           ),
           Expanded(
-            child  : ListView(
-                 children : [
-                   ListTile(
-                     title : Text('Po mu bien'),
-                     onTap: () => _changeUrl('https://www.youtube.com/watch?v=24N7XmXf3kc'),
-                   ),
-                    ListTile(
-                     title : Text('Machista'),
-                      onTap: () => _changeUrl('https://www.youtube.com/watch?v=UKU8_iTtB3Y'),
-                   ),
-                    ListTile(
-                     title : Text('fila 3'),
-                   ),
-                    ListTile(
-                     title : Text('fila 3'),
-                   ),
-                    ListTile(
-                     title : Text('fila 3'),
-                   ),
-                    ListTile(
-                     title : Text('fila 3'),
-                   ),
-                    ListTile(
-                     title : Text('fila 3'),
-                   ),
-                    ListTile(
-                     title : Text('fila 3'),
-                   ),
-                    ListTile(
-                     title : Text('fila 3'),
-                   ),
-                 ]
-               ),
+            child  : 
+              dataLoaded == false 
+                ? Center(
+                    child: Container(child :  CircularProgressIndicator(),width: 50,height: 50)
+                  )
+                : ListView.builder(
+                  itemCount: apmList.length,
+                  itemBuilder: (context,i) =>
+                    Column(
+                      children : [
+                        i != 0 ? Divider(height: 3) : Container(),
+                        ListTile(
+                          contentPadding: EdgeInsets.all(5),
+                          leading : Icon(Icons.play_arrow, size : 30),
+                          title : Text(apmList[i].name),
+                          onTap: () => _changeUrl(apmList[i].url),
+                        )
+                      ]
+                    )
+                    
+                )
           )
          
         ],

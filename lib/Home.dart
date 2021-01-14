@@ -33,7 +33,7 @@ class _HomeState extends State<Home> {
 
  //force the floatingactionBtn to appear 3 seconds later (when data has to be loaded)
   void setTimer(){
-    Timer(Duration(seconds: 5), (){
+    Timer(Duration(seconds: 10), (){
       setState(() {
         viewFloatingActBtn = true;
       });  
