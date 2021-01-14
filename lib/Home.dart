@@ -9,6 +9,7 @@ import 'dart:async';
 
 import 'package:easy_pip/easy_pip.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:lottie/lottie.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -32,7 +33,7 @@ class _HomeState extends State<Home> {
 
  //force the floatingactionBtn to appear 3 seconds later (when data has to be loaded)
   void setTimer(){
-    Timer(Duration(seconds: 3), (){
+    Timer(Duration(seconds: 5), (){
       setState(() {
         viewFloatingActBtn = true;
       });  
@@ -64,7 +65,12 @@ class _HomeState extends State<Home> {
   void _showDeleteConfirmation(Apm apm){
     AlertDialog dialog = new AlertDialog(
       title: ListTile(
-        leading: Icon(Icons.warning,color: Colors.orangeAccent,),
+        leading:  Lottie.asset(
+                     'assets/lottie/delete.json',
+                     width: 50,
+                     height: 50,
+                     fit : BoxFit.fill
+                   ),
         title: Text('Confirmación de borrado'),
       ),
       contentPadding: EdgeInsets.all(20),
@@ -109,15 +115,16 @@ class _HomeState extends State<Home> {
   }
 
 void _openVideoUrl(String url) async{
-  setState(() {
-    isEnabled = false;
-  });
-  await Future.delayed(Duration(milliseconds: 500));
-  setState(() {
-      videoUrl = url;
-      isEnabled = true;
-  });
+    setState(() {
+      isEnabled = false;
+    });
+    await Future.delayed(Duration(milliseconds: 500));
+    setState(() {
+        videoUrl = url;
+        isEnabled = true;
+    });
 }
+  
   @override
   Widget build(BuildContext context) {
     return PIPStack(
@@ -146,11 +153,22 @@ void _openVideoUrl(String url) async{
                             viewFloatingActBtn == false && i == 0
                             ? Padding(
                                 padding: EdgeInsets.all(15),
-                                child : Text('Mantén presionado en alguna fila para ver las operaciones disponibles',style: TextStyle(fontSize: 20),textAlign: TextAlign.center,))
+                                child : Column(
+                                  children : [
+                                    Lottie.asset(
+                                      'assets/lottie/go-forward.json',
+                                      width: 150,
+                                      height: 150,
+                                      fit: BoxFit.fill,
+                                    ),
+                                    Text('Mantén presionado en alguna fila para ver las operaciones disponibles',
+                                      style: TextStyle(fontSize: 20),textAlign: TextAlign.center,)
+                                  ])
+                                )
                             : Container(),
                             i != 0 ?
                               Divider(height : 5) : Container(),
-
+                            
                             Slidable(
                               actionPane: SlidableDrawerActionPane(),
                               actionExtentRatio: 0.25,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:apm_pip/models/apmModel.dart';
 import 'package:apm_pip/common/httpHandler.dart';
+import 'package:lottie/lottie.dart';
 
 class CreateAPM extends StatefulWidget {
   @override
@@ -52,10 +53,16 @@ class _CreateAPMState extends State<CreateAPM> {
           children: [
              Column(
                  children: [
-                   CircleAvatar(
+                  /* CircleAvatar(
                      radius: 30,
                      child : Icon(Icons.plus_one_rounded, size: 40),
                      backgroundColor: Colors.grey,
+                   ),*/
+                   Lottie.asset(
+                     'assets/lottie/add.json',
+                     width: 100,
+                     height: 100,
+                     fit : BoxFit.fill
                    ),
                     TextField(
                       decoration: InputDecoration(hintText: 'Nombre *'),

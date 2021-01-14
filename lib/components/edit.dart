@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:apm_pip/models/apmModel.dart';
 import 'package:apm_pip/common/httpHandler.dart';
+import 'package:lottie/lottie.dart';
 
 class EditApm extends StatefulWidget {
 
@@ -61,10 +62,16 @@ class _EditApmState extends State<EditApm> {
           children: [
              Column(
                  children: [
-                   CircleAvatar(
+                   /*CircleAvatar(
                      radius: 30,
                      child : Icon(Icons.edit, size: 40),
                      backgroundColor: Colors.grey,
+                   ),*/
+                   Lottie.asset(
+                     'assets/lottie/edit.json',
+                     width: 100,
+                     height: 100,
+                     fit : BoxFit.fill
                    ),
                     TextField(
                       decoration: InputDecoration(hintText: 'Nombre *'),

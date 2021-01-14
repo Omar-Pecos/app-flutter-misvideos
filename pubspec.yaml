@@ -32,6 +32,7 @@ dependencies:
   flutter_slidable: ^0.5.7
   easy_pip: ^0.1.0
   ext_video_player: ^0.0.4
+  lottie: ^0.7.0+1
 
 dev_dependencies:
   flutter_test:
@@ -47,6 +48,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/lottie/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
