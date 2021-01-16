@@ -1,4 +1,4 @@
-package com.example.apm_pip
+package com.omarpv.misapm
 
 import io.flutter.embedding.android.FlutterActivity
 
