@@ -42,8 +42,11 @@ class _YoutubeVideoViewerState extends State<YoutubeVideoViewer> {
 
   void loadApms() async{
     try {
-      apmList = await HttpHandler().getAll();
-      dataLoaded = true;
+      List<Apm> data = await HttpHandler().getAll();
+      setState((){
+        apmList = data;
+        dataLoaded = true;
+      });
     } catch (e) {
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(e, style: TextStyle(color: Colors.white),),backgroundColor: Colors.red[300]));
     }
