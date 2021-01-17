@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:ext_video_player/ext_video_player.dart';
 import 'package:apm_pip/models/apmModel.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class YoutubeVideoViewer extends StatefulWidget {
   final url;
   YoutubeVideoViewer({@required this.url});
@@ -19,25 +21,35 @@ class _YoutubeVideoViewerState extends State<YoutubeVideoViewer> {
   bool dataLoaded = false;
   List<Apm> apmList;
 
+  bool platFormWeb = false;
+
   _YoutubeVideoViewerState({@required this.url});
 
  
   @override
   void initState() {
     super.initState();
-
+      _checkPlatform();
       loadApms();
       
       _controller = VideoPlayerController.network(
         url
       );
-      print(url);
+        //print(url);
       _controller.addListener(() {
         setState(() {});
       });
       _controller.setLooping(true);
       _controller.initialize().catchError((e) => onError(e));
     
+  }
+
+  _checkPlatform(){
+    if (kIsWeb){
+      setState(() {
+        platFormWeb = true;
+      });
+    }
   }
 
   void loadApms() async{
@@ -90,7 +102,10 @@ class _YoutubeVideoViewerState extends State<YoutubeVideoViewer> {
         children: <Widget>[
           Container(
             child: AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
+              aspectRatio: 
+                platFormWeb
+                ? 3
+                : _controller.value.aspectRatio,
               child: Stack(
                 alignment: Alignment.bottomCenter,
                 children: <Widget>[

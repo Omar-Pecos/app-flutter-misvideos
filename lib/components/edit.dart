@@ -3,6 +3,8 @@ import 'package:apm_pip/models/apmModel.dart';
 import 'package:apm_pip/common/httpHandler.dart';
 import 'package:lottie/lottie.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class EditApm extends StatefulWidget {
 
   final Apm apm;
@@ -22,14 +24,25 @@ class _EditApmState extends State<EditApm> {
   TextEditingController _commandController = new TextEditingController();
   TextEditingController _urlController = new TextEditingController();
 
+  bool platFormWeb = false;
+  
   @override
   void initState() {
     super.initState();
+    _checkPlatform();
 
     _nameController.text = apm.name;
     _descController.text = apm.desc;
     _commandController.text = apm.command;
     _urlController.text = apm.url;
+  }
+
+  _checkPlatform(){
+    if (kIsWeb){
+      setState(() {
+        platFormWeb = true;
+      });
+    }
   }
 
   void _sendPut(Apm apm) async{
@@ -62,16 +75,17 @@ class _EditApmState extends State<EditApm> {
           children: [
              Column(
                  children: [
-                   /*CircleAvatar(
-                     radius: 30,
-                     child : Icon(Icons.edit, size: 40),
-                     backgroundColor: Colors.grey,
-                   ),*/
-                   Lottie.asset(
-                     'assets/lottie/edit.json',
-                     width: 100,
-                     height: 100,
-                     fit : BoxFit.fill
+                      platFormWeb 
+                    ? CircleAvatar(
+                        child : Icon(Icons.edit, color: Colors.white, size: 40,),
+                        backgroundColor: Colors.grey,
+                        radius : 30
+                    )
+                    : Lottie.asset(
+                        'assets/lottie/edit.json',
+                        width: 100,
+                        height: 100,
+                        fit : BoxFit.fill
                    ),
                     TextField(
                       decoration: InputDecoration(hintText: 'Nombre *'),

@@ -11,6 +11,8 @@ import 'package:easy_pip/easy_pip.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lottie/lottie.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -23,12 +25,23 @@ class _HomeState extends State<Home> {
   var isEnabled = false;
   var videoUrl = '';
 
+  bool platFormWeb = false;
+
    @override
   void initState() {
     super.initState();
+    _checkPlatform();
 
     futureListApm$ = HttpHandler().getAll();
     setTimer();
+  }
+
+  _checkPlatform(){
+    if (kIsWeb){
+      setState(() {
+        platFormWeb = true;
+      });
+    }
   }
 
  //force the floatingactionBtn to appear 3 seconds later (when data has to be loaded)
@@ -65,7 +78,10 @@ class _HomeState extends State<Home> {
   void _showDeleteConfirmation(Apm apm){
     AlertDialog dialog = new AlertDialog(
       title: ListTile(
-        leading:  Lottie.asset(
+        leading: 
+          platFormWeb 
+                  ? Icon(Icons.warning, size: 50,color: Colors.orangeAccent,)
+                  : Lottie.asset(
                      'assets/lottie/delete.json',
                      width: 50,
                      height: 50,
@@ -155,11 +171,17 @@ void _openVideoUrl(String url) async{
                                 padding: EdgeInsets.all(15),
                                 child : Column(
                                   children : [
-                                    Lottie.asset(
-                                      'assets/lottie/go-forward.json',
-                                      width: 150,
-                                      height: 150,
-                                      fit: BoxFit.fill,
+                                      platFormWeb 
+                                    ? CircleAvatar(
+                                        child : Icon(Icons.arrow_forward, color: Colors.white, size: 40,),
+                                        backgroundColor: Colors.grey,
+                                        radius : 30
+                                    )
+                                    : Lottie.asset(
+                                        'assets/lottie/go-forward.json',
+                                        width: 150,
+                                        height: 150,
+                                        fit: BoxFit.fill,
                                     ),
                                     Text('Mantén presionado en alguna fila para ver las operaciones disponibles',
                                       style: TextStyle(fontSize: 20),textAlign: TextAlign.center,)
@@ -232,7 +254,9 @@ void _openVideoUrl(String url) async{
           : Container(),
 
         pipEnabled: isEnabled,
-        pipShrinkHeight: 130,
+        pipShrinkHeight: platFormWeb
+          ? 75
+          : 130,
 
         onClosed: () {
           setState(() {

@@ -3,6 +3,8 @@ import 'package:apm_pip/models/apmModel.dart';
 import 'package:apm_pip/common/httpHandler.dart';
 import 'package:lottie/lottie.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 class CreateAPM extends StatefulWidget {
   @override
   _CreateAPMState createState() => _CreateAPMState();
@@ -11,7 +13,7 @@ class CreateAPM extends StatefulWidget {
 class _CreateAPMState extends State<CreateAPM> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-   Apm apm = new Apm(
+  Apm apm = new Apm(
       id: 0,
       name: '',
       command: '',
@@ -21,11 +23,28 @@ class _CreateAPMState extends State<CreateAPM> {
       updatedAt: new DateTime.now()
     );
 
-    TextEditingController _nameController = new TextEditingController();
-    TextEditingController _descController = new TextEditingController();
-    TextEditingController _commandController = new TextEditingController();
-    TextEditingController _urlController = new TextEditingController();
+  TextEditingController _nameController = new TextEditingController();
+  TextEditingController _descController = new TextEditingController();
+  TextEditingController _commandController = new TextEditingController();
+  TextEditingController _urlController = new TextEditingController();
+
+  bool platFormWeb = false;
   
+  _checkPlatform(){
+    if (kIsWeb){
+      setState(() {
+        platFormWeb = true;
+      });
+    }
+  }
+
+  @override
+  void initState() { 
+    super.initState();
+
+    _checkPlatform();
+  }
+
   void _sendPost(Apm apm) async{
    Apm apmCreated;
     try{
@@ -53,16 +72,17 @@ class _CreateAPMState extends State<CreateAPM> {
           children: [
              Column(
                  children: [
-                  /* CircleAvatar(
-                     radius: 30,
-                     child : Icon(Icons.plus_one_rounded, size: 40),
-                     backgroundColor: Colors.grey,
-                   ),*/
-                   Lottie.asset(
-                     'assets/lottie/add.json',
-                     width: 100,
-                     height: 100,
-                     fit : BoxFit.fill
+                      platFormWeb 
+                    ? CircleAvatar(
+                        child : Icon(Icons.plus_one, color: Colors.white, size: 40,),
+                        backgroundColor: Colors.grey,
+                        radius : 30
+                    )
+                    : Lottie.asset(
+                        'assets/lottie/add.json',
+                        width: 100,
+                        height: 100,
+                        fit : BoxFit.fill
                    ),
                     TextField(
                       decoration: InputDecoration(hintText: 'Nombre *'),
