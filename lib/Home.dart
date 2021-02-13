@@ -90,7 +90,7 @@ class _HomeState extends State<Home> {
         title: Text('Confirmación de borrado'),
       ),
       contentPadding: EdgeInsets.all(20),
-      content: Text('El APM con nombre "${apm.name}" se eliminará y no podrá recuperarlo. ¿Desea proceder con la eliminación?'),
+      content: Text('El vídeo con nombre "${apm.name}" se eliminará y no podrá recuperarlo. ¿Desea proceder con la eliminación?'),
       actions: [
         FlatButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancelar'),color : Colors.black26,textColor: Colors.white,),
         FlatButton(onPressed: () => _sendDelete(apm.id), child: Text('Eliminar'),color : Colors.black26,textColor: Colors.white,)
@@ -148,7 +148,7 @@ void _openVideoUrl(String url) async{
         
          Scaffold(
             appBar: AppBar(
-              title: Text('Lista de APMs'),
+              title: Text('Lista de Videos'),
             ),
             body: FutureBuilder<List<Apm>>(
               future: futureListApm$,

@@ -1,4 +1,4 @@
-package com.omarpv.misapm
+package com.omarpv.misvideos
 
 import io.flutter.embedding.android.FlutterActivity
 

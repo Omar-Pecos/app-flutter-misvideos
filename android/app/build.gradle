@@ -43,7 +43,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.omarpv.misapm"
+        applicationId "com.omarpv.misvideos"
         minSdkVersion 21
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
